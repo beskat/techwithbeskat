@@ -5,10 +5,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.Browser;
+import org.openqa.selenium.remote.LocalFileDetector;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.Random;
 
@@ -21,6 +27,8 @@ public class WebDriverFactory {
     private static List<String> BROWSER_LIST;
     private static boolean randomizeBrowser;
     private static String defaultBrowser;
+    private static boolean enableGrid;
+    private static String gridUrl;
 
     private static final Random random = new Random();
 
@@ -37,6 +45,16 @@ public class WebDriverFactory {
     @Value("${test.browser.default}")
     public void setDefaultBrowser(String defaultBrowser) {
         WebDriverFactory.defaultBrowser = defaultBrowser;
+    }
+
+    @Value("${test.grid.enable}")
+    public void setEnableGrid(boolean enableGrid) {
+        WebDriverFactory.enableGrid = enableGrid;
+    }
+
+    @Value("${test.grid.hub.url}")
+    public void setGridUrl(String gridUrl) {
+        WebDriverFactory.gridUrl = gridUrl;
     }
 
     public static WebDriver getDriver() {
@@ -65,7 +83,7 @@ public class WebDriverFactory {
         }
     }
 
-    public static void createDriver() {
+    public static void createDriver() throws Exception {
         String browserType = defaultBrowser;
 
         if (randomizeBrowser) {
@@ -76,11 +94,21 @@ public class WebDriverFactory {
         log.info("Using browser type: {}", browserType);
 
         if (Browser.CHROME.is(browserType)) {
-            THREAD_LOCAL_DRIVER.set(createLocalChromeDriver());
-        } else { // The other browser types can be added in this class as well
+            THREAD_LOCAL_DRIVER.set(createChromeDriver());
+        } else if (Browser.FIREFOX.is(browserType)) {
+            THREAD_LOCAL_DRIVER.set(createFirefoxDriver());
+        } else {
             log.error("Unknown browser type entered.");
-            throw new RuntimeException("Unknown browser type entered.");
+            throw new Exception("Unknown browser type entered.");
         }
+    }
+
+    private static WebDriver createChromeDriver() throws MalformedURLException {
+        return enableGrid ? createRemoteChromeDriver() : createLocalChromeDriver();
+    }
+
+    private static WebDriver createFirefoxDriver() throws MalformedURLException {
+        return enableGrid ? createRemoteFirefoxDriver() : createLocalFirefoxDriver();
     }
 
     private static WebDriver createLocalChromeDriver() {
@@ -90,6 +118,40 @@ public class WebDriverFactory {
 
         WebDriver webDriver = new ChromeDriver(chromeOptions);
         setBasicWebDriverProperties(webDriver);
+
+        return webDriver;
+    }
+
+    private static WebDriver createLocalFirefoxDriver() {
+        WebDriverManager.firefoxdriver().setup();
+
+        FirefoxOptions fireFoxOptions = new FirefoxOptions();
+
+        WebDriver webDriver = new FirefoxDriver(fireFoxOptions);
+        setBasicWebDriverProperties(webDriver);
+
+        return webDriver;
+    }
+
+    private static WebDriver createRemoteChromeDriver() throws MalformedURLException {
+        String remoteUrl = gridUrl;
+
+        ChromeOptions chromeOptions = new ChromeOptions();
+
+        RemoteWebDriver webDriver = new RemoteWebDriver(new URL(remoteUrl), chromeOptions);
+        setBasicWebDriverProperties(webDriver);
+        webDriver.setFileDetector(new LocalFileDetector());
+
+        return webDriver;
+    }
+
+    private static WebDriver createRemoteFirefoxDriver() throws MalformedURLException {
+        String remoteUrl = gridUrl;
+        FirefoxOptions fireFoxOptions = new FirefoxOptions();
+
+        RemoteWebDriver webDriver = new RemoteWebDriver(new URL(remoteUrl), fireFoxOptions);
+        setBasicWebDriverProperties(webDriver);
+        webDriver.setFileDetector(new LocalFileDetector());
 
         return webDriver;
     }

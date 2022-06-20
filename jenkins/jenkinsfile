@@ -1,0 +1,30 @@
+pipeline {
+    agent any
+
+    options {
+        skipDefaultCheckout()
+        ansiColor('xterm')
+        disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '100'))
+    }
+
+    stages {
+        stage('Checkout Source Code') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Start Selenium Grid') {
+            steps {
+                sh 'docker-compose -f docker-compose.yml up'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                sh script: "mvn clean test -Dstyle.color=always -Dtest.grid.enable=true"
+            }
+        }
+    }
+}

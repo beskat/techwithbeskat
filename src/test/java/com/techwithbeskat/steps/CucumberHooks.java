@@ -16,7 +16,7 @@ public class CucumberHooks {
      * Runs before each tests(features) with tag '@ui'
      */
     @Before("@ui")
-    public void beforeEach() {
+    public void beforeEach() throws Exception {
         WebDriverFactory.createDriver();
     }
 
