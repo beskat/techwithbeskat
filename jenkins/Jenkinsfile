@@ -16,7 +16,7 @@ pipeline {
 
         stage('Start Selenium Grid') {
             steps {
-                sh '/usr/bin/docker-compose -f docker-compose.yml up'
+                sh '/usr/local/bin/docker-compose -f docker-compose.yml up'
             }
         }
 
@@ -28,7 +28,7 @@ pipeline {
     }
     post {
         always {
-            sh '/usr/bin/docker-compose down --remove-orphans'
+            sh '/usr/local/bin/docker-compose down --remove-orphans'
         }
     }
 }
