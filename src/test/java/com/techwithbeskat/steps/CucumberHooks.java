@@ -13,7 +13,7 @@ import java.io.ByteArrayInputStream;
 public class CucumberHooks {
 
     /**
-     * Runs before each tests(features) with tag '@ui'
+     * Runs before each test(feature) with tag '@ui'
      */
     @Before("@ui")
     public void beforeEach() throws Exception {
@@ -21,7 +21,7 @@ public class CucumberHooks {
     }
 
     /**
-     * Runs after each tests(features) with tag '@ui' whether pass or fail
+     * Runs after each test(features) with tag '@ui' whether pass or fail
      */
     @After("@ui")
     public void afterEach(Scenario scenario) {

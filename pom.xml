@@ -23,6 +23,7 @@
         <junit-platform.version>1.8.2</junit-platform.version>
         <cucumber.version>7.1.0</cucumber.version>
         <allure.cucumber.version>2.17.2</allure.cucumber.version>
+        <rest.assured.version>4.2.0</rest.assured.version>
         <webdrivermanager.version>5.0.3</webdrivermanager.version>
         <lombok.version>1.18.22</lombok.version>
     </properties>
@@ -88,6 +89,21 @@
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-cucumber7-jvm</artifactId>
             <version>${allure.cucumber.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <version>${rest.assured.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>json-path</artifactId>
+            <version>${rest.assured.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>xml-path</artifactId>
+            <version>${rest.assured.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.bonigarcia</groupId>
